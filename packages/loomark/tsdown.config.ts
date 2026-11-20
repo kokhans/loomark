@@ -14,7 +14,6 @@ const shared: UserConfig = {
 export default defineConfig([
   {
     ...shared,
-    // Build-time entries run in Node: the build pipeline, the framework integrations and the CLI.
     entry: {
       index: 'src/index.ts',
       next: 'src/next/index.ts',
@@ -26,7 +25,6 @@ export default defineConfig([
   },
   {
     ...shared,
-    // Runtime entries are shipped to the browser, so they must not assume Node.
     entry: {
       query: 'src/query/index.ts',
       search: 'src/search/index.ts',

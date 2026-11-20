@@ -1,6 +1,7 @@
 import { parse as parseYaml } from 'yaml'
 import { isRecord } from './shared/values.js'
 
+/** Frontmatter data and the Markdown body after it. */
 export type FrontmatterResult = {
   data: Record<string, unknown>
   body: string
@@ -8,6 +9,7 @@ export type FrontmatterResult = {
 
 const FRONTMATTER = /^---\r?\n(?:([\s\S]*?)\r?\n)?---[ \t]*(?:\r?\n|$)/
 
+/** Splits YAML frontmatter from the Markdown body. */
 export function parseFrontmatter(source: string): FrontmatterResult {
   const match = FRONTMATTER.exec(source)
   if (!match) return { data: {}, body: source }

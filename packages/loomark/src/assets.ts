@@ -2,39 +2,35 @@ import { createHash } from 'node:crypto'
 import { copyFile, mkdir, readFile, realpath } from 'node:fs/promises'
 import path from 'node:path'
 
+/** Default folder inside `publicDir` for images. */
 export const DEFAULT_ASSETS_DIR = 'loomark'
 
+/** An image to copy into the public folder. */
 export type Asset = {
-  /** Source file next to the Markdown file. */
   file: string
-  /** File name inside the assets folder. */
   name: string
   url: string
 }
 
+/** Result of resolving an image source. `undefined` keeps the source as written. */
 export type AssetResult = { asset: Asset } | { error: string } | undefined
 
+/** Resolves and copies the images of a build. */
 export type Assets = {
-  /**
-   * Resolves `src` relative to the Markdown file. Returns undefined when `src` is not a relative
-   * path, so URLs and root paths such as `/logo.png` stay as written.
-   */
   resolve: (markdownFile: string, src: string) => Promise<AssetResult>
-  /** Marks an asset to be copied by `write()`. Only assets of published entries are added. */
   add: (asset: Asset) => void
-  /** Copies every added asset. Returns their paths relative to publicDir, for stale cleanup. */
   write: () => Promise<string[]>
 }
 
 const URL_SCHEME = /^[a-z][a-z\d+.-]*:/i
 
+/** Creates the image handling of one build. */
 export function createAssets(
   publicDir: string | undefined,
   assetsDir: string,
   contentDir: string,
 ): Assets {
   const copies = new Map<string, string>()
-  // Real paths, so a symlink cannot point an image outside the content folder.
   let contentRoot: Promise<string> | undefined
   const urlBase = `/${assetsDir.split(path.sep).filter(Boolean).join('/')}`
 
@@ -76,13 +72,14 @@ export function createAssets(
   return { resolve, add, write }
 }
 
-/** True when `file` is `folder` itself or anywhere below it. */
+/** Whether `file` is `folder` or inside it. */
 export function isInside(folder: string, file: string): boolean {
   const relative = path.relative(folder, file)
   if (path.isAbsolute(relative)) return false
   return relative !== '..' && !relative.startsWith(`..${path.sep}`)
 }
 
+/** Whether `src` is a path relative to the Markdown file. */
 export function isRelative(src: string): boolean {
   return src.length > 0 && !URL_SCHEME.test(src) && !src.startsWith('/') && !src.startsWith('#')
 }

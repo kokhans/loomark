@@ -9,14 +9,16 @@ import { bundledLanguages, createHighlighter, type Highlighter } from 'shiki'
 import { unified } from 'unified'
 import type { MarkdownOptions, ShikiTheme, TocItem } from './types.js'
 
-/** Rewrites an image source. Returns undefined to keep the source as written. */
+/** Returns the new source of an image, or `undefined` to keep it. */
 export type ImageResolver = (src: string) => Promise<string | undefined>
 
+/** Options of `renderMarkdown()`. */
 export type RenderOptions = {
   markdown?: MarkdownOptions
   resolveImage?: ImageResolver
 }
 
+/** HTML and metadata of a rendered Markdown body. */
 export type RenderedMarkdown = {
   html: string
   toc: TocItem[]
@@ -28,7 +30,6 @@ export type RenderedMarkdown = {
 
 const MERMAID_LANGUAGE = 'mermaid'
 const FALLBACK_LANGUAGE = 'text'
-// Shiki renders these without a grammar.
 const PLAIN_LANGUAGES = new Set(['text', 'txt', 'plain', 'plaintext', 'ansi'])
 const WORDS_PER_MINUTE = 200
 const EXCERPT_LENGTH = 160
@@ -46,7 +47,6 @@ type CodeState = {
 const highlighters = new Map<string, Promise<Highlighter>>()
 const unknownLanguages = new Set<string>()
 
-/** One highlighter per theme and language setup. Bundled languages are added on demand. */
 function getHighlighter(options: MarkdownOptions | undefined): Promise<Highlighter> {
   const themes = options?.shiki?.themes ?? DEFAULT_THEMES
   const langs = options?.shiki?.langs ?? []
@@ -68,6 +68,7 @@ function langName(lang: string | { name: string }): string {
   return typeof lang === 'string' ? lang : lang.name
 }
 
+/** Renders Markdown to HTML with highlighted code, heading ids and metadata. */
 export async function renderMarkdown(
   body: string,
   options: RenderOptions = {},
@@ -104,7 +105,6 @@ export async function renderMarkdown(
   }
 }
 
-/** Loads every bundled Shiki language used by a code block, so any of them highlights. */
 async function loadCodeLanguages(highlighter: Highlighter, tree: MarkdownNode): Promise<void> {
   const loaded = new Set(highlighter.getLoadedLanguages())
   const missing = new Set<string>()
@@ -239,7 +239,6 @@ type MarkdownNode = {
   children?: MarkdownNode[]
 }
 
-// Prose text only: code blocks, raw HTML and link URLs are not read as words.
 const PROSE_TYPES = new Set(['text', 'inlineCode'])
 
 function countWords(tree: MarkdownNode): { wordCount: number; readingTime: number } {

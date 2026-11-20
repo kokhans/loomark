@@ -1,10 +1,12 @@
 import { escapeXml } from './shared/url.js'
 
+/** One URL in a sitemap. */
 export type SitemapItem = {
   loc: string
   lastmod?: string
 }
 
+/** Renders a `sitemap.xml`. */
 export function renderSitemap(items: SitemapItem[]): string {
   const urls = items
     .map((item) => {

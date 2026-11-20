@@ -3,6 +3,7 @@ import { build } from '../build.js'
 import type { BuildMode, BuildOptions } from '../types.js'
 import { startWatcher, type StopWatching } from '../watch.js'
 
+/** Help text of the `loomark` command. */
 export const HELP = `Usage: loomark <command> [options]
 
 Commands:
@@ -18,14 +19,14 @@ Options:
 
 const MODES: readonly BuildMode[] = ['development', 'production']
 
+/** Output and lifetime hooks of the CLI. */
 export type CliIo = {
   log(message: string): void
   error(message: string): void
-  /** Resolves when the process is asked to stop, for example on Ctrl+C. */
   untilStopped(): Promise<void>
 }
 
-/** Runs the CLI and returns the exit code. */
+/** Runs the CLI with the given arguments and returns the exit code. */
 export async function run(argv: readonly string[], io: CliIo): Promise<number> {
   let parsed: ReturnType<typeof parse>
   try {
@@ -86,7 +87,6 @@ function parse(argv: readonly string[]) {
 async function runBuild(options: BuildOptions, io: CliIo): Promise<number> {
   const started = performance.now()
   try {
-    // Development builds log invalid files themselves; production builds throw with all of them.
     const { entries, errors } = await build(options)
     if (errors.length > 0) {
       io.error(`loomark: ${plural(errors.length, 'invalid content file', 'invalid content files')}`)
@@ -109,7 +109,6 @@ async function runBuild(options: BuildOptions, io: CliIo): Promise<number> {
 async function runWatch(options: BuildOptions, io: CliIo): Promise<number> {
   let stop: StopWatching
   try {
-    // A broken first build is reported but does not stop watching, so it can be fixed in place.
     await build(options).catch((error: unknown) => {
       io.error(messageOf(error))
     })

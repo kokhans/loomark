@@ -1,8 +1,8 @@
 # Loomark
 
-Loomark turns folders of Markdown files with YAML frontmatter into typed, queryable content for
-React apps. It works with **Next.js (App Router)**, **React Router v8 (framework mode)** and
-**TanStack Start**.
+Loomark is a build-time data library for Next.js 16, React Router v8 and TanStack Start that
+compiles Markdown collections into searchable, filterable, sortable and SEO-friendly content for
+blogs and docs. It works with the Next.js App Router and React Router framework mode.
 
 Content is edited by hand in your editor. There is no admin UI and no database.
 
@@ -781,3 +781,12 @@ What the package expects, independent of the manager:
   `loomark/mermaid`.
 - The `#loomark` alias relies on the `imports` field in your `package.json`, which every manager
   writes identically; the resolver (Next.js, Vite, Node) does the rest.
+
+## Changelog
+
+Release notes for every version are on the
+[GitHub Releases page](https://github.com/kokhans/loomark/releases).
+
+## License
+
+[MIT](https://github.com/kokhans/loomark/blob/main/LICENSE)

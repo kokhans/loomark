@@ -1,12 +1,17 @@
+/** `auto` follows `prefers-color-scheme`. */
 export type MermaidTheme = 'auto' | 'light' | 'dark'
 
+/** Options of `renderMermaid()`. */
 export type RenderMermaidOptions = {
+  /** Defaults to `auto`. */
   theme?: MermaidTheme
+  /** Defaults to `pre.mermaid`. */
   selector?: string
 }
 
 const DEFAULT_SELECTOR = 'pre.mermaid'
 
+/** Renders the Mermaid diagrams inside `root`, loading Mermaid only when one exists. */
 export async function renderMermaid(
   root?: HTMLElement,
   options: RenderMermaidOptions = {},

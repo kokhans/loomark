@@ -1,3 +1,4 @@
+/** Escapes text for XML. */
 export function escapeXml(value: string): string {
   return value
     .replaceAll('&', '&amp;')
@@ -7,6 +8,7 @@ export function escapeXml(value: string): string {
     .replaceAll("'", '&apos;')
 }
 
+/** Joins a site URL and a path with exactly one slash. */
 export function joinUrl(siteUrl: string, url: string): string {
   return `${siteUrl.replace(/\/+$/, '')}/${url.replace(/^\/+/, '')}`
 }

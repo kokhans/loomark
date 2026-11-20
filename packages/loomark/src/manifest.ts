@@ -3,22 +3,17 @@ import path from 'node:path'
 import { isInside } from './assets.js'
 import { isRecord } from './shared/values.js'
 
-/** Hidden, so it can never clash with a collection file such as `posts.json`. */
+/** Name of the manifest in the output folder. */
 export const MANIFEST_FILE = '.manifest.json'
 
-/**
- * Every file a build wrote. The next build deletes only files listed here that it did not write
- * again, so files Loomark did not create are never touched, whatever outDir or publicDir hold.
- */
+/** Files written by a build, used to remove stale files on the next one. */
 export type Manifest = {
-  /** Files in outDir. */
   outFiles: string[]
-  /** publicDir relative to the project root, when one was configured. */
   publicDir?: string
-  /** Files in publicDir: feed copies and images. */
   publicFiles: string[]
 }
 
+/** Reads the manifest of the previous build. */
 export async function readManifest(outDir: string): Promise<Manifest | undefined> {
   const source = await readFile(path.join(outDir, MANIFEST_FILE), 'utf8').catch(() => undefined)
   if (source === undefined) return undefined
@@ -35,6 +30,7 @@ export async function readManifest(outDir: string): Promise<Manifest | undefined
   }
 }
 
+/** Writes the manifest of the current build. */
 export async function writeManifest(outDir: string, manifest: Manifest): Promise<void> {
   await writeFile(path.join(outDir, MANIFEST_FILE), `${JSON.stringify(manifest, null, 2)}\n`)
 }
@@ -52,7 +48,6 @@ export async function removeStaleFiles(
 
   if (previous.publicDir !== undefined) {
     const publicDir = path.resolve(cwd, previous.publicDir)
-    // A manifest is only trusted to clean up inside the project.
     if (!isInside(cwd, publicDir)) return
     const kept = previous.publicDir === current.publicDir ? current.publicFiles : []
     await removeMissing(publicDir, previous.publicFiles, kept)

@@ -2,10 +2,12 @@ import { build } from '../build.js'
 import type { BuildMode, BuildOptions } from '../types.js'
 import { createRebuildQueue } from '../watch.js'
 
+/** The part of the Vite file watcher the plugin uses. */
 export type ViteWatcher = {
   on(event: 'change' | 'add' | 'unlink', listener: (file: string) => void): void
 }
 
+/** The part of the Vite dev server the plugin uses. */
 export type ViteDevServer = {
   watcher: ViteWatcher
   ws: {
@@ -13,10 +15,12 @@ export type ViteDevServer = {
   }
 }
 
+/** The part of the resolved Vite config the plugin uses. */
 export type ViteResolvedConfig = {
   command: 'build' | 'serve'
 }
 
+/** The Loomark Vite plugin. */
 export type LoomarkPlugin = {
   name: string
   enforce: 'pre'
@@ -28,6 +32,7 @@ export type LoomarkPlugin = {
 const MARKDOWN_EXTENSION = '.md'
 const CONFIG_FILE = 'loomark.config.ts'
 
+/** Vite plugin that builds content on start and rebuilds it in development. */
 export function loomark(options: BuildOptions = {}): LoomarkPlugin {
   let mode: BuildMode | undefined = options.mode
 

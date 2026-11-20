@@ -3,15 +3,13 @@ import path from 'node:path'
 import { build, resolveProject } from './build.js'
 import type { BuildOptions } from './types.js'
 
+/** Stops a watcher. */
 export type StopWatching = () => void
 
 const REBUILD_DELAY = 100
 const MARKDOWN_EXTENSION = '.md'
 
-/**
- * Runs `task` at most once at a time. A request that arrives while the task is running is not
- * dropped: the task runs once more afterwards. Errors are logged so the dev server keeps running.
- */
+/** Runs a task at most once at a time and once more when asked while running. Logs failures. */
 export function createRebuildQueue(task: () => Promise<void>): () => Promise<void> {
   let running: Promise<void> | undefined
   let pending = false
@@ -38,6 +36,7 @@ export function createRebuildQueue(task: () => Promise<void>): () => Promise<voi
   }
 }
 
+/** Rebuilds when a Markdown file or the config file changes. */
 export async function startWatcher(options: BuildOptions = {}): Promise<StopWatching> {
   const project = await resolveProject(options)
   let timer: ReturnType<typeof setTimeout> | undefined
@@ -57,8 +56,6 @@ export async function startWatcher(options: BuildOptions = {}): Promise<StopWatc
     }),
   ]
 
-  // An inline config is not reloaded, so only a config file is worth watching. Its folder is
-  // watched rather than the file, because editors often save by replacing the file.
   if (!options.config && project.configFile) {
     const configName = path.basename(project.configFile)
     watchers.push(

@@ -48,6 +48,7 @@ type LoadedConfig = {
   configFile: string | undefined
 }
 
+/** Loads the config and resolves its folders to absolute paths. */
 export async function resolveProject(options: BuildOptions = {}): Promise<Project> {
   const cwd = options.cwd ?? process.cwd()
   const loaded: LoadedConfig = options.config
@@ -64,6 +65,7 @@ export async function resolveProject(options: BuildOptions = {}): Promise<Projec
   }
 }
 
+/** Builds every collection and writes the output folder. */
 export async function build(options: BuildOptions = {}): Promise<BuildResult> {
   const project = await resolveProject(options)
   const mode = options.mode ?? (isProduction() ? 'production' : 'development')
@@ -108,7 +110,6 @@ export async function build(options: BuildOptions = {}): Promise<BuildResult> {
 
 function assetsDirOf(config: LoomarkConfig): string {
   const dir = path.normalize(config.assetsDir ?? DEFAULT_ASSETS_DIR)
-  // The folder is emptied of stale files on every build, so it must never be publicDir itself.
   if (dir === '.' || dir.startsWith('..') || path.isAbsolute(dir)) {
     throw new Error(
       `loomark: assetsDir must be a subfolder of publicDir, got "${config.assetsDir ?? ''}"`,
@@ -119,7 +120,6 @@ function assetsDirOf(config: LoomarkConfig): string {
 
 async function loadConfig(cwd: string, configFile: string | undefined): Promise<LoadedConfig> {
   const file = path.resolve(cwd, configFile ?? DEFAULT_CONFIG_FILE)
-  // A fresh module cache on every load picks up edits to the config and to helpers it imports.
   const jiti = createJiti(import.meta.url, { moduleCache: false })
   const loaded = await jiti.import<{ default?: unknown }>(file)
 
@@ -159,7 +159,6 @@ async function buildCollection(
       errors.push(...result.errors)
       continue
     }
-    // Drafts are left out of production builds, together with their images and image errors.
     if (mode === 'production' && isDraft(result.entry)) continue
 
     collected.push(result.entry)
@@ -285,7 +284,6 @@ function renderFeeds(project: Project, collections: BuiltCollection[]): Feed[] {
     }),
   })
 
-  // `rss: true` collections share rss.xml, which is only written when it has items.
   const combined = collections.filter((item) => item.definition.rss === true)
   if (rssItemsOf(combined, siteUrl).length > 0) feeds.push(renderFeed(COMBINED_FEED, combined))
 
@@ -310,7 +308,6 @@ function feedFileOf(collection: string, options: RssFeedOptions): string {
   return options.file ?? `${collection}.xml`
 }
 
-/** Feed files share the output folder with each other and with sitemap.xml, so names must differ. */
 function assertFeedFiles(config: LoomarkConfig): void {
   const used = new Set(['sitemap.xml', COMBINED_FEED])
   for (const [name, definition] of Object.entries(config.collections)) {
@@ -330,7 +327,6 @@ function assertFeedFiles(config: LoomarkConfig): void {
 
 let warnedAboutSiteUrl = false
 
-/** Feeds need absolute URLs, so they are skipped without siteUrl. Say so where it matters. */
 function warnWithoutSiteUrl(config: LoomarkConfig, mode: BuildMode): void {
   if (config.siteUrl || warnedAboutSiteUrl) return
   const wantsRss = Object.values(config.collections).some((item) => item.rss)
