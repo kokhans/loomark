@@ -3,6 +3,7 @@ import type { SearchIndex } from '../search-index.js'
 
 export type { SearchDocument, SearchIndex } from '../search-index.js'
 
+/** A search result with the stored fields of its entry. */
 export type SearchHit = {
   id: string
   url: string
@@ -10,14 +11,18 @@ export type SearchHit = {
   [field: string]: unknown
 }
 
+/** Options of `search()`. */
 export type SearchOptions = {
+  /** Maximum number of hits. */
   limit?: number
 }
 
+/** Full text search over a collection. */
 export type Search = {
   search(query: string, options?: SearchOptions): SearchHit[]
 }
 
+/** Creates a search from `<collection>.search.json`. */
 export function createSearch(index: SearchIndex): Search {
   const miniSearch = new MiniSearch({
     fields: index.fields,

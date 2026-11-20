@@ -1,5 +1,6 @@
 import type { Entry, RuntimeCollection } from './types.js'
 
+/** A collection with its built entries. */
 export type BuiltCollection = {
   name: string
   definition: RuntimeCollection
@@ -60,6 +61,7 @@ const RESERVED_WORDS = new Set([
 const INTERNAL_PREFIX = '__loomark'
 const CREATE_COLLECTION = `${INTERNAL_PREFIX}CreateCollection`
 
+/** Throws when a collection name is not a valid JavaScript export name. */
 export function assertCollectionName(name: string): void {
   if (!IDENTIFIER.test(name) || RESERVED_WORDS.has(name) || name.startsWith(INTERNAL_PREFIX)) {
     throw new Error(
@@ -69,6 +71,7 @@ export function assertCollectionName(name: string): void {
   }
 }
 
+/** Renders `.loomark/index.js`. */
 export function renderIndexModule(collections: BuiltCollection[]): string {
   const imports = collections.map(
     (item) => `import ${entryName(item.name)} from './${item.name}.json' with { type: 'json' }`,
@@ -84,6 +87,7 @@ export function renderIndexModule(collections: BuiltCollection[]): string {
   ].join('\n')
 }
 
+/** Renders `.loomark/index.d.ts`. */
 export function renderIndexTypes(
   collections: BuiltCollection[],
   configImport: string | undefined,
@@ -104,6 +108,7 @@ export function renderIndexTypes(
   return [`${imports.join('\n')}\n`, ...declarations, ''].join('\n')
 }
 
+/** Lists the fields that hold dates, so the runtime can revive them. */
 export function collectDateFields(entries: Entry[]): string[] {
   const fields = new Set<string>()
   for (const entry of entries) {

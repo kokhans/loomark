@@ -1,7 +1,7 @@
 {
   "name": "loomark",
   "version": "0.1.0",
-  "description": "Build-time Markdown content library for React apps",
+  "description": "Loomark is a build-time data library for Next.js 16, React Router v8 and TanStack Start that compiles Markdown collections into searchable, filterable, sortable and SEO-friendly content for blogs and docs.",
   "author": "Serhii Kokhan",
   "license": "MIT",
   "repository": {
@@ -91,7 +91,7 @@
     "remark-gfm": "^4.0.1",
     "remark-parse": "^11.0.0",
     "remark-rehype": "^11.1.2",
-    "shiki": "^4.5.0",
+    "shiki": "^4.6.0",
     "unified": "^11.0.5",
     "yaml": "^2.9.1",
     "zod": "^4.6.7"
@@ -105,11 +105,11 @@
     }
   },
   "devDependencies": {
-    "@types/hast": "^3.0.4",
-    "@types/node": "^22.19.1",
-    "mermaid": "^12.2.0",
-    "tsdown": "^0.23.4",
-    "typescript": "^5.9.3",
-    "vitest": "^5.0.5"
+    "@types/hast": "^3.0.5",
+    "@types/node": "^26.6.6",
+    "mermaid": "^12.3.0",
+    "tsdown": "^0.23.7",
+    "typescript": "^6.0.3",
+    "vitest": "^5.1.1"
   }
 }

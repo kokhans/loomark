@@ -1,7 +1,9 @@
 import { joinUrl } from '../shared/url.js'
 
+/** An author name or a name with a URL. */
 export type SeoAuthor = string | { name: string; url?: string }
 
+/** Entry fields the SEO helpers read. */
 export type SeoEntry = {
   title: string
   description: string
@@ -13,17 +15,20 @@ export type SeoEntry = {
   author?: SeoAuthor | SeoAuthor[]
 }
 
+/** Options shared by every SEO helper. */
 export type SeoOptions = {
-  /** Makes the canonical URL, `og:url` and relative image paths absolute. */
+  /** Makes the canonical URL, `og:url` and root-relative images absolute. */
   siteUrl?: string
-  /** Fallback image for entries without a cover. */
+  /** Image for entries without `cover`. */
   image?: string
-  /** Default author for entries without an `author` field. */
+  /** Author for entries without `author`. */
   author?: SeoAuthor | SeoAuthor[]
 }
 
+/** A normalized author. */
 export type SeoPerson = { name: string; url?: string }
 
+/** SEO fields mapped from an entry. */
 export type SeoFields = {
   title: string
   description: string
@@ -34,6 +39,7 @@ export type SeoFields = {
   authors: SeoPerson[]
 }
 
+/** A Next.js `Metadata` object. */
 export type NextMetadata = {
   title: string
   description: string
@@ -56,15 +62,18 @@ export type NextMetadata = {
   authors?: SeoPerson[]
 }
 
+/** A React Router meta descriptor. */
 export type ReactRouterMeta =
   { title: string } | { name: string; content: string } | { property: string; content: string }
 
+/** TanStack Router `head()` options. */
 export type TanStackHead = {
   meta: ReactRouterMeta[]
   links: { rel: 'canonical'; href: string }[]
   scripts: { type: 'application/ld+json'; children: string }[]
 }
 
+/** A schema.org `BlogPosting` object. */
 export type BlogPosting = {
   '@context': 'https://schema.org'
   '@type': 'BlogPosting'
@@ -77,8 +86,10 @@ export type BlogPosting = {
   author?: JsonLdPerson | JsonLdPerson[]
 }
 
+/** A schema.org `Person` object. */
 export type JsonLdPerson = { '@type': 'Person'; name: string; url?: string }
 
+/** Maps an entry to the fields every SEO helper uses. */
 export function toSeoFields(entry: SeoEntry, options: SeoOptions = {}): SeoFields {
   const modified = entry.updated ?? entry.date
   const image = entry.cover ?? options.image
@@ -94,6 +105,7 @@ export function toSeoFields(entry: SeoEntry, options: SeoOptions = {}): SeoField
   }
 }
 
+/** Returns Next.js metadata for an entry. */
 export function toMetadata(entry: SeoEntry, options: SeoOptions = {}): NextMetadata {
   const fields = toSeoFields(entry, options)
 
@@ -120,6 +132,7 @@ export function toMetadata(entry: SeoEntry, options: SeoOptions = {}): NextMetad
   }
 }
 
+/** Returns React Router meta descriptors for an entry. */
 export function toMeta(entry: SeoEntry, options: SeoOptions = {}): ReactRouterMeta[] {
   const fields = toSeoFields(entry, options)
   const meta: ReactRouterMeta[] = [
@@ -147,6 +160,7 @@ export function toMeta(entry: SeoEntry, options: SeoOptions = {}): ReactRouterMe
   return meta
 }
 
+/** Returns a schema.org `BlogPosting` for an entry. */
 export function jsonLd(entry: SeoEntry, options: SeoOptions = {}): BlogPosting {
   const fields = toSeoFields(entry, options)
   const people: JsonLdPerson[] = fields.authors.map((person) => ({ '@type': 'Person', ...person }))
@@ -164,6 +178,7 @@ export function jsonLd(entry: SeoEntry, options: SeoOptions = {}): BlogPosting {
   }
 }
 
+/** Returns TanStack Router `head()` options for an entry. */
 export function toHead(entry: SeoEntry, options: SeoOptions = {}): TanStackHead {
   return {
     meta: toMeta(entry, options),
@@ -177,7 +192,6 @@ export function toHead(entry: SeoEntry, options: SeoOptions = {}): TanStackHead 
   }
 }
 
-/** Joins root-relative paths with siteUrl. Absolute URLs and paths without siteUrl are kept. */
 function absolute(url: string, siteUrl: string | undefined): string {
   if (!siteUrl || /^[a-z][a-z\d+.-]*:/i.test(url) || url.startsWith('//')) return url
   return joinUrl(siteUrl, url)

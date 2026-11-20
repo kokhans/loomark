@@ -4,58 +4,88 @@ import type { SearchOption, SortOption } from '../types.js'
 
 export type { Entry, SearchOption, SortDirection, SortOption, TocItem } from '../types.js'
 
+/** The item type of an array type. */
 export type ArrayItem<V> = V extends readonly (infer Item)[] ? Item : never
 
+/** Operators that filter one field. */
 export type FieldFilter<V> = {
+  /** Equal to the value. */
   equals?: V
+  /** Equal to one of the values. */
   in?: readonly V[]
+  /** An array field that contains the value. */
   has?: ArrayItem<V>
+  /** An array field that contains at least one of the values. */
   hasSome?: readonly ArrayItem<V>[]
+  /** An array field that contains every value. */
   hasEvery?: readonly ArrayItem<V>[]
+  /** Greater than the value. */
   gt?: V
+  /** Greater than or equal to the value. */
   gte?: V
+  /** Less than the value. */
   lt?: V
+  /** Less than or equal to the value. */
   lte?: V
+  /** A string field that contains the text, ignoring case. */
   contains?: string
+  /** Does not match the value or filter. */
   not?: V | FieldFilter<V>
 }
 
+/** Filters by field. A plain value means `equals`. */
 export type WhereOption<T> = { [K in keyof T]?: T[K] | FieldFilter<T[K]> }
 
+/** Options of `query()`. */
 export type QueryOptions<T> = {
+  /** Field filters. All must match. */
   where?: WhereOption<T>
+  /** Text that every result must contain, ranked by matches. */
   search?: string
+  /** Sort order. Defaults to the collection sort. */
   sort?: SortOption
+  /** Page number, starting at 1. */
   page?: number
+  /** Page size. Defaults to the collection `perPage`. */
   perPage?: number
+  /** Fields to return. Returns every field when empty. */
   select?: readonly string[]
 }
 
+/** One page of matching entries. */
 export type QueryResult<T> = {
   items: T[]
+  /** Number of matching entries on all pages. */
   total: number
   perPage: number
   page: number
+  /** At least 1. */
   totalPages: number
   hasNext: boolean
   hasPrev: boolean
 }
 
+/** A field value and how many entries have it. */
 export type DistinctValue = {
   value: string
   count: number
 }
 
+/** The entries before and after an entry in sort order. */
 export type AdjacentEntries<T> = {
   prev: T | undefined
   next: T | undefined
 }
 
+/** Options of `related()`. */
 export type RelatedOptions = {
+  /** Field to compare. Defaults to `tags`. */
   by?: string
+  /** Maximum number of entries. Defaults to 3. */
   limit?: number
 }
 
+/** Settings that `.loomark/index.js` passes to `createCollection()`. */
 export type CollectionConfig = {
   name: string
   sort?: SortOption
@@ -64,17 +94,28 @@ export type CollectionConfig = {
   dates?: string[]
 }
 
+/** A queryable collection of entries. */
 export type Collection<T extends object> = {
   name: string
+  /** Every entry in the collection sort order. */
   all(): T[]
+  /** Every entry with only the selected fields. */
   all(options: { select: readonly string[] }): Partial<T>[]
+  /** Every entry without `html` and `body`. */
   list(): Omit<T, 'html' | 'body'>[]
+  /** The entry with this slug. */
   get(slug: string): T | undefined
+  /** The first page of every entry. */
   query(): QueryResult<T>
+  /** Filters, searches, sorts and pages entries, returning only the selected fields. */
   query(options: QueryOptions<T> & { select: readonly string[] }): QueryResult<Partial<T>>
+  /** Filters, searches, sorts and pages entries. */
   query(options: QueryOptions<T>): QueryResult<T>
+  /** Every value of a field with its entry count, most common first. */
   distinct(field: keyof T & string): DistinctValue[]
+  /** The previous and next entry in the collection sort order. */
   adjacent(slug: string): AdjacentEntries<T>
+  /** Entries that share the most values of a field with this one, `tags` by default. */
   related(slug: string, options?: RelatedOptions): T[]
 }
 
@@ -135,6 +176,7 @@ function isFilter(value: unknown): value is Record<string, unknown> {
   return Object.keys(value).some((key) => key in operators)
 }
 
+/** Creates a queryable collection from built entries. */
 export function createCollection<T extends object>(
   entries: readonly T[],
   config: CollectionConfig,
@@ -221,7 +263,6 @@ export function createCollection<T extends object>(
   return { name: config.name, all, list, get, query, distinct, adjacent, related }
 }
 
-/** Maps each slug to its position in the sorted entries. The first entry wins on duplicates. */
 function indexBySlug(items: readonly object[]): Map<unknown, number> {
   const positions = new Map<unknown, number>()
   items.forEach((entry, index) => {

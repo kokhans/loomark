@@ -1,17 +1,21 @@
+/** Whether the value is a plain object. */
 export function isRecord(value: unknown): value is Record<string, unknown> {
   return (
     typeof value === 'object' && value !== null && !Array.isArray(value) && !(value instanceof Date)
   )
 }
 
+/** Views an object as a record of fields. */
 export function asRecord(value: object): Record<string, unknown> {
   return value as Record<string, unknown>
 }
 
+/** Reads one field of an object. */
 export function readField(entry: object, field: string): unknown {
   return asRecord(entry)[field]
 }
 
+/** Converts a date or date string to a timestamp. */
 export function toTime(value: unknown): number | undefined {
   if (value instanceof Date) return Number.isNaN(value.getTime()) ? undefined : value.getTime()
   if (typeof value === 'string') {
@@ -21,6 +25,7 @@ export function toTime(value: unknown): number | undefined {
   return undefined
 }
 
+/** Compares dates, numbers and strings. Empty values sort last. */
 export function compareValues(left: unknown, right: unknown): number {
   const leftEmpty = left === undefined || left === null
   const rightEmpty = right === undefined || right === null
@@ -41,6 +46,7 @@ export function compareValues(left: unknown, right: unknown): number {
   return 0
 }
 
+/** Compares two values, matching dates by time. */
 export function equalsValue(left: unknown, right: unknown): boolean {
   if (left instanceof Date || right instanceof Date) {
     const leftTime = toTime(left)
@@ -50,6 +56,7 @@ export function equalsValue(left: unknown, right: unknown): boolean {
   return left === right
 }
 
+/** Wraps a single value in an array. Empty values give an empty array. */
 export function toArray(value: unknown): unknown[] {
   if (value === undefined || value === null) return []
   return Array.isArray(value) ? value : [value]

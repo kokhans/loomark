@@ -1,5 +1,6 @@
 import { escapeXml } from './shared/url.js'
 
+/** One item of an RSS feed. */
 export type RssItem = {
   title: string
   url: string
@@ -7,15 +8,16 @@ export type RssItem = {
   date: Date
 }
 
+/** Channel settings and items of an RSS feed. */
 export type RssOptions = {
   title: string
   description: string
   siteUrl: string
-  /** Absolute URL the feed is served from, for `<atom:link rel="self">`. */
   feedUrl?: string
   items: RssItem[]
 }
 
+/** Renders an RSS 2.0 feed. */
 export function renderRss(options: RssOptions): string {
   const items = options.items
     .map((item) => {
@@ -31,7 +33,6 @@ export function renderRss(options: RssOptions): string {
     })
     .join('\n')
 
-  // The newest item date keeps the output stable between builds of the same content.
   const lastBuildDate = options.items
     .map((item) => item.date)
     .reduce<Date | undefined>(

@@ -1,6 +1,6 @@
 ---
 title: Welcome to Loomark
-description: A small content library that turns Markdown folders into typed collections for React apps.
+description: A build-time data library for Next.js 16, React Router v8 and TanStack Start that compiles Markdown collections into searchable, filterable, sortable and SEO-friendly content for blogs and docs.
 date: 2026-10-20
 tags: [loomark, markdown]
 cover: /images/layers.svg

@@ -1,7 +1,8 @@
 # Agents
 
-Loomark is a build-time Markdown content library for React apps (Next.js App Router, React Router v8
-and TanStack Start). It turns Markdown files with YAML frontmatter into typed JSON collections, a
+Loomark is a build-time data library for Next.js 16, React Router v8 and TanStack Start that
+compiles Markdown collections into searchable, filterable, sortable and SEO-friendly content for
+blogs and docs. It turns Markdown files with YAML frontmatter into typed JSON collections, a
 search index, `sitemap.xml` and `rss.xml` inside `.loomark/`.
 
 ## Layout
@@ -19,6 +20,7 @@ search index, `sitemap.xml` and `rss.xml` inside `.loomark/`.
 pnpm install
 pnpm build            # build the library
 pnpm test             # run vitest
+pnpm typecheck        # tsc
 pnpm lint             # eslint
 pnpm format:check     # prettier
 pnpm build:examples   # build all example apps
@@ -32,6 +34,18 @@ pnpm build:examples   # build all example apps
 - Add or update tests in `packages/loomark/test` for behavior changes.
 - Usage docs live in `packages/loomark/README.md`, development docs in the root `README.md`.
 - Keep `packages/loomark/README.md` in sync with public API changes.
+
+## Comments and Descriptions
+
+- Write no comments: no line, block or end-of-line comments in code, configs or workflows. Make
+  the code explain itself with clear names and small functions. Name workflow steps with `name:`.
+- Give every exported function, type and constant a one-line JSDoc description (`/** ... */`).
+- Describe public option and result fields with one line when the name is not enough. State
+  defaults as `Defaults to ...`.
+- Keep descriptions short and plain: one sentence in present tense that says what it is or does,
+  not how it works. Do not start with "This function".
+- Allowed tool comments: the CLI shebang, `@ts-expect-error` in type tests and `eslint-disable`
+  with a reason.
 
 ## Markdown Conventions
 

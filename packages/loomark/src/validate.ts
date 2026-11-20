@@ -2,9 +2,11 @@ import type { z } from 'zod'
 import { isRecord } from './shared/values.js'
 import type { ValidationError } from './types.js'
 
+/** Validated frontmatter, or the errors found. */
 export type ValidationResult =
   { ok: true; data: Record<string, unknown> } | { ok: false; errors: ValidationError[] }
 
+/** Frontmatter to validate and where it comes from. */
 export type ValidationOptions = {
   schema: z.ZodType
   data: Record<string, unknown>
@@ -14,6 +16,7 @@ export type ValidationOptions = {
 
 type Issue = z.core.$ZodIssue
 
+/** Validates frontmatter with the collection schema. */
 export function validateFrontmatter(options: ValidationOptions): ValidationResult {
   const result = options.schema.safeParse(options.data)
   if (result.success) {
@@ -31,10 +34,12 @@ export function validateFrontmatter(options: ValidationOptions): ValidationResul
   }
 }
 
+/** Formats an error as `file: "field" — message`. */
 export function formatError(error: ValidationError): string {
   return `${error.file}: "${error.field}" — ${error.message}`
 }
 
+/** Logs errors as warnings. */
 export function reportErrors(errors: ValidationError[]): void {
   for (const error of errors) {
     console.warn(`loomark: ${formatError(error)}`)

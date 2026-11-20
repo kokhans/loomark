@@ -7,6 +7,7 @@ import { slugFromFile } from './slug.js'
 import type { Entry, MarkdownOptions, RuntimeCollection, ValidationError } from './types.js'
 import { validateFrontmatter } from './validate.js'
 
+/** A Markdown file and the collection it belongs to. */
 export type EntryInput = {
   source: string
   filePath: string
@@ -18,7 +19,7 @@ export type EntryInput = {
   resolveAsset?: (markdownFile: string, src: string) => Promise<AssetResult>
 }
 
-/** A valid entry can still carry errors, such as a missing image, that fail production builds. */
+/** A built entry with its images and errors, or the errors that prevented it. */
 export type EntryResult =
   | { ok: true; entry: Entry; assets: Asset[]; errors: ValidationError[] }
   | { ok: false; errors: ValidationError[] }
@@ -27,6 +28,7 @@ type UrlResolver = (entry: Entry) => string
 
 const FILE_REFERENCE = /^\.\.?\//
 
+/** Parses, validates and renders one Markdown file. */
 export async function createEntry(input: EntryInput): Promise<EntryResult> {
   const file = path.relative(input.cwd, input.filePath).split(path.sep).join('/')
 
@@ -73,7 +75,6 @@ export async function createEntry(input: EntryInput): Promise<EntryResult> {
     markdown: input.markdown,
     resolveImage: (src) => resolveImage(src, 'body'),
   })
-  // `z.object()` strips unknown keys, so fall back to the raw frontmatter for `slug`.
   const slug = slugOf({ ...frontmatter.data, ...fields }, input.folder, input.filePath)
   const excerpt = typeof fields['excerpt'] === 'string' ? fields['excerpt'] : rendered.excerpt
 
@@ -100,7 +101,6 @@ export async function createEntry(input: EntryInput): Promise<EntryResult> {
   }
 }
 
-/** Frontmatter strings such as `cover: ./cover.png` point at files next to the Markdown file. */
 async function resolveFieldImages(
   fields: Record<string, unknown>,
   resolveImage: (src: string, field: string) => Promise<string | undefined>,
@@ -123,6 +123,7 @@ function resolveUrl(definition: RuntimeCollection, entry: Entry): string {
   return resolve(entry)
 }
 
+/** Whether the entry has `draft: true`. */
 export function isDraft(entry: Entry): boolean {
   return readField(entry, 'draft') === true
 }

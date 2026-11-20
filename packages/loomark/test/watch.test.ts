@@ -19,14 +19,12 @@ afterAll(async () => {
   await Promise.all(created.map((dir) => rm(dir, { recursive: true, force: true })))
 })
 
-// Longer than the watcher's 100ms debounce, so a rebuild would have finished by then.
 const SETTLE_TIME = 500
 
 function post(title: string): string {
   return `---\ntitle: ${title}\n---\n\nBody.\n`
 }
 
-// A config whose schema overrides every title, so a config edit is visible in the output.
 function configSource(title: string): string {
   return [
     'const schema = {',
@@ -62,7 +60,6 @@ async function createProject(): Promise<string> {
 
 async function watch(root: string): Promise<void> {
   stop = await startWatcher({ cwd: root, config: testConfig() })
-  // Let events from creating the project drain before the test touches any files.
   await delay(SETTLE_TIME)
 }
 
